@@ -11,7 +11,7 @@
 //           try {
 //             const formData = new FormData();
 //             formData.append("file", file);
-    
+
 //             const resFile = await axios({
 //               method: "post",
 //               url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -54,8 +54,6 @@
 //         return <div>Error: Missing provider</div>;
 //     }
 
-    
-
 //     return (
 //         <div className="top">
 //             <form className="form" onSubmit={handleSubmit}>
@@ -72,11 +70,12 @@
 
 // export default FileUpload;
 
-
 import { useState } from "react";
 import axios from "axios";
 import "./FileUpload.css";
-const FileUpload = ({ contracts , accounts , providers }) => {
+import { Upload } from "lucide-react";
+
+const FileUpload = ({ contracts, accounts, providers }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
   const handleSubmit = async (e) => {
@@ -97,7 +96,7 @@ const FileUpload = ({ contracts , accounts , providers }) => {
           },
         });
         const ImgHash = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
-        contracts.add(accounts,ImgHash);
+        contracts.add(accounts, ImgHash);
         let field = await contracts.display(accounts);
         console.log(field);
         alert("Successfully Image Uploaded");
@@ -124,21 +123,32 @@ const FileUpload = ({ contracts , accounts , providers }) => {
   };
   return (
     <div className="top">
-      <form className="form" onSubmit={handleSubmit}>
-        <label htmlFor="file-upload" className="choose">
-          Choose Image
-        </label>
-        <input
-          disabled={!accounts}
-          type="file"
-          id="file-upload"
-          name="data"
-          onChange={retrieveFile}
-        />
-        <span className="textArea">Image: {fileName}</span>
-        <button type="submit" className="upload" disabled={!file}>
-          Upload File
-        </button>
+      <form className="form flex-center gap-32" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="file-upload" className="choose text-xl">
+            Choose Image
+          </label>
+          <input
+            disabled={!accounts}
+            type="file"
+            id="file-upload"
+            name="data"
+            onChange={retrieveFile}
+            className="text-slate-400 text-sm"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-slate-400">
+            {fileName.substring(0, 30)} ...
+          </span>
+          <button
+            type="submit"
+            className="upload flex-center bg-blue-500 border-2 border-blue-500 hover:text-blue-400 hover:bg-transparent hover:cursor-pointer px-2.5 py-2 rounded-md hover:-translate-y-1 transition-transform hover:scale-105"
+            disabled={!file}
+          >
+            <Upload />
+          </button>
+        </div>
       </form>
     </div>
   );

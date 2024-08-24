@@ -1,7 +1,9 @@
 import { useState } from "react";
 import "./Display.css";
+
 const Display = ({ contracts, accounts }) => {
   const [data, setData] = useState("");
+
   const getdata = async () => {
     console.log("Button clicked");
     let dataArray;
@@ -50,14 +52,19 @@ const Display = ({ contracts, accounts }) => {
   return (
     <>
       <div className="image-list">{data}</div>
-      <input
-        type="text"
-        placeholder="Enter Address"
-        className="address"
-      ></input>
-      <button className="center button" onClick={getdata}>
-        Get Data
-      </button>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Enter Address"
+          className="address px-2.5 py-2 border rounded-md bg-transparent text-slate-300 bg-slate-700 outline-none border-slate-600 shadow-md shadow-black"
+        />
+        <button
+          className="center button flex-center bg-green-600 border-2 border-green-600 hover:text-green-400 hover:bg-transparent hover:cursor-pointer px-2.5 py-2 rounded-md"
+          onClick={getdata}
+        >
+          Fetch
+        </button>
+      </div>
     </>
   );
 };
