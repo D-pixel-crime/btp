@@ -74,42 +74,50 @@ import { useState } from "react";
 import axios from "axios";
 import "./FileUpload.css";
 import { Upload } from "lucide-react";
+import { DNA } from "react-loader-spinner";
 
 const FileUpload = ({ contracts, accounts, providers }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
+  const [startedUpload, setStartedUpload] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
 
-        const resFile = await axios({
-          method: "post",
-          url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
-          data: formData,
-          headers: {
-            pinata_api_key: `4d25b17c2a9a77f3e1ec`,
-            pinata_secret_api_key: `ce548c1953df25cc4f6320b9149d781cd1d9011d6acddaa9cbce7b0ee5a19d6c`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        const ImgHash = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
-        contracts.add(accounts, ImgHash);
-        let field = await contracts.display(accounts);
-        console.log(field);
-        alert("Successfully Image Uploaded");
-        setFileName("No image selected");
-        setFile(null);
-      } catch (e) {
-        alert("Unable to upload image to Pinata");
+    setStartedUpload(true); // Show spinner
+
+    setTimeout(async () => {
+      if (file) {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const resFile = await axios({
+            method: "post",
+            url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+            data: formData,
+            headers: {
+              pinata_api_key: `4d25b17c2a9a77f3e1ec`,
+              pinata_secret_api_key: `ce548c1953df25cc4f6320b9149d781cd1d9011d6acddaa9cbce7b0ee5a19d6c`,
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          const ImgHash = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
+          contracts.add(accounts, ImgHash);
+          await contracts.display(accounts);
+
+          setFileName("No image selected");
+          setFile(null);
+          alert("Successfully Image Uploaded");
+        } catch (e) {
+          alert("Unable to upload image to Pinata");
+        } finally {
+          setStartedUpload(false); // Hide spinner after upload completes
+        }
       }
-    }
-    alert("Successfully Image Uploaded");
-    setFileName("No image selected");
-    setFile(null);
+    }, 1500);
   };
+
   const retrieveFile = (e) => {
     const data = e.target.files[0]; //files array of files object
     // console.log(data);
@@ -121,6 +129,7 @@ const FileUpload = ({ contracts, accounts, providers }) => {
     setFileName(e.target.files[0].name);
     e.preventDefault();
   };
+
   return (
     <div className="top">
       <form className="form flex-center gap-32" onSubmit={handleSubmit}>
@@ -143,10 +152,16 @@ const FileUpload = ({ contracts, accounts, providers }) => {
           </span>
           <button
             type="submit"
-            className="upload flex-center bg-blue-500 border-2 border-blue-500 hover:text-blue-400 hover:bg-transparent hover:cursor-pointer px-2.5 py-2 rounded-md hover:-translate-y-1 transition-transform hover:scale-105"
+            className={`upload flex-center ${
+              startedUpload ? "bg-black border-slate-600" : "bg-blue-500"
+            } border-2 border-blue-500 hover:text-blue-400 hover:bg-transparent hover:cursor-pointer px-2.5 py-2 rounded-md hover:-translate-y-1 transition-transform hover:scale-105`}
             disabled={!file}
           >
-            <Upload />
+            {startedUpload ? (
+              <DNA visible={true} height={50} width={50} />
+            ) : (
+              <Upload />
+            )}
           </button>
         </div>
       </form>
